@@ -1,0 +1,28 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "amigoapp",
+    "database": "sequelizets",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "port": 8080,
+    "logging": false,
+    "timestamps": true,
+    "paranoid": true,
+    "raw": true
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

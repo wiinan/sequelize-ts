@@ -13,6 +13,11 @@ class HandleRedis {
     const syncRedisSet = promisify(redisClient.set).bind(redisClient);
     return syncRedisSet(key, value);
   };
+
+  deleteRedis = (value: string) => {
+    const syncRedisDel = promisify(redisClient.del).bind(redisClient);
+    return syncRedisDel(value);
+  };
 }
 
 export default new HandleRedis();

@@ -1,4 +1,5 @@
 import db from "../models";
+import redisUtils from "../redisConfig";
 
 type UserRequest = {
   id: number;
@@ -14,7 +15,15 @@ class CartService {
 
       if (id) return await db.Carts.findByPk(id);
 
-      return await db.Carts.findAll({});
+      const redisCart = await redisUtils.getRedis("carts");
+
+      if (!redisCart) {
+        const carts = await db.Carts.findAll({});
+        await redisUtils.setRedis("carts", JSON.stringify(carts));
+        return carts;
+      }
+
+      return JSON.parse(redisCart);
     } catch (err) {
       throw err;
     }
@@ -40,6 +49,8 @@ class CartService {
       }
       const value = product.price + cart.total_price;
 
+      await redisUtils.deleteRedis("carts");
+
       return await db.Carts.update(
         { total_price: value },
         { where: { id: cart.id } }
@@ -51,6 +62,7 @@ class CartService {
 
   async delete(params: string): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("carts");
       return await db.Carts.delete({ where: { id: params } });
     } catch (err) {
       throw err;

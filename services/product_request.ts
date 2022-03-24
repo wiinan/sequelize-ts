@@ -1,7 +1,8 @@
 import db from "../models";
+import redisUtils from "../redisConfig";
 
 type ProductReqRequest = {
-  id: string;
+  id: number;
   product_id: number;
   request_id: number;
   user_id: number;
@@ -16,7 +17,20 @@ class ProductRequestService {
 
       if (id) return await db.Products_requests.findByPk(id);
 
-      return await db.Products_requests.findAll({});
+      const redisProductsRequestes = await redisUtils.getRedis(
+        "product_requester"
+      );
+
+      if (!redisProductsRequestes) {
+        const productsRequesters = await db.Products_requests.findByPk(id);
+        await redisUtils.setRedis(
+          "product_requester",
+          JSON.stringify(productsRequesters)
+        );
+        return productsRequesters;
+      }
+
+      return JSON.parse(redisProductsRequestes);
     } catch (err) {
       throw err;
     }
@@ -26,6 +40,9 @@ class ProductRequestService {
     try {
       await db.Products_requests.create(data);
 
+      await redisUtils.deleteRedis("product_requester");
+      await redisUtils.deleteRedis("carts");
+
       return await db.carts.delete({ where: { user_id: data.user_id } });
     } catch (err) {
       throw err;
@@ -34,17 +51,19 @@ class ProductRequestService {
 
   async update(
     data: ProductReqRequest,
-    params: string
+    params: number
   ): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("product_requester");
       return await db.Products_requests.update(data, { where: { id: params } });
     } catch (err) {
       throw err;
     }
   }
 
-  async delete(params: string): Promise<Object | Error> {
+  async delete(params: number): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("product_requester");
       return await db.Products_requests.delete({ where: { id: params } });
     } catch (err) {
       throw err;

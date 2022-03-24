@@ -1,4 +1,6 @@
 import db from "../models";
+import redisUtils from "../redisConfig";
+import products from "../schemas/products";
 
 type ProductRequest = {
   id: string;
@@ -13,7 +15,15 @@ class ProductsService {
 
       if (id) return await db.Products.findByPk(id);
 
-      return await db.Products.findAll({});
+      const redisProducts = await redisUtils.getRedis("products");
+
+      if (!redisProducts) {
+        const products = await db.Products.findAll({});
+        await redisUtils.setRedis("products", JSON.stringify(products));
+        return products;
+      }
+
+      return JSON.parse(redisProducts);
     } catch (err) {
       throw err;
     }

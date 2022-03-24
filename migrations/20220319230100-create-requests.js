@@ -20,6 +20,10 @@ module.exports = {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

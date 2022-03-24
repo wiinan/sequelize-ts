@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Providers, { foreignKey: "provider_id" });
+      this.belongsTo(models.Users, { foreignKey: "user_id" });
     }
   }
   Requests.init(
@@ -19,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
+      user_id: { type: DataTypes.INTEGER, allowNull: false },
     },
     {
       sequelize,

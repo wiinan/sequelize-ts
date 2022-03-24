@@ -16,9 +16,9 @@ class UserService {
     try {
       const id = data;
 
-      const redisUsers = await redisUtils.getRedis("users");
-
       if (id) return await db.Users.findByPk(id);
+
+      const redisUsers = await redisUtils.getRedis("users");
 
       if (!redisUsers) {
         const users = await db.Users.findAll({});
@@ -37,6 +37,8 @@ class UserService {
       const user = await db.Users.findOne({ where: { email: data.email } });
 
       if (user) throw Error("Este email ja existe!");
+
+      await redisUtils.deleteRedis("users");
 
       return await db.Users.create(data);
     } catch (err) {
@@ -69,6 +71,16 @@ class UserService {
 
   async update(data: UserRequest, params: number): Promise<Object | Error> {
     try {
+      const user = await db.Users.findByPk(params, { raw: true });
+
+      if (!user) throw Error("Usuario nao encontrado!");
+
+      const isValid = bcryptjs.compareSync(data.password, user.password);
+
+      if (!isValid) throw Error("Senha Invalida!");
+
+      await redisUtils.deleteRedis("users");
+
       return await db.Users.update(data, { where: { id: params } });
     } catch (err) {
       throw err;
@@ -77,6 +89,7 @@ class UserService {
 
   async delete(params: number): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("users");
       return await db.Users.delete({ where: { id: params } });
     } catch (err) {
       throw err;

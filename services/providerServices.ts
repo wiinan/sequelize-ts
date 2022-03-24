@@ -1,4 +1,5 @@
 import db from "../models";
+import redisUtils from "../redisConfig";
 
 type ProviderRequest = {
   id: number;
@@ -19,7 +20,15 @@ class ProvidersService {
 
       if (id) return await db.Providers.findByPk(id);
 
-      return await db.Providers.findAll({});
+      const redisProviders = await redisUtils.getRedis("providers");
+
+      if (!redisProviders) {
+        const providers = await db.Providers.findAll({});
+        await redisUtils.setRedis("providers", JSON.stringify(providers));
+        return providers;
+      }
+
+      return JSON.stringify(redisProviders);
     } catch (err) {
       throw err;
     }

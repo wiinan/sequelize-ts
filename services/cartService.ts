@@ -1,7 +1,7 @@
 import db from "../models";
 import redisUtils from "../redisConfig";
 
-type UserRequest = {
+type CartRequest = {
   id: number;
   user_id: number;
   product_id: string;
@@ -9,7 +9,7 @@ type UserRequest = {
 };
 
 class CartService {
-  async index(filter: Object): Promise<Object | Error> {
+  async index(filter: Object): Promise<CartRequest | Error> {
     try {
       const id = filter;
 
@@ -30,9 +30,9 @@ class CartService {
   }
 
   async storeAndUpdate(
-    data: UserRequest,
+    data: CartRequest,
     filter: number
-  ): Promise<Object | Error> {
+  ): Promise<CartRequest | Error> {
     try {
       const product = await db.Products.findByPk(filter, { raw: true });
       const cart = await db.Carts.findOne({
@@ -41,6 +41,8 @@ class CartService {
       });
 
       if (!cart) {
+        await redisUtils.deleteRedis("carts");
+
         return await db.carts.create({
           user_id: data.user_id,
           product_id: filter,

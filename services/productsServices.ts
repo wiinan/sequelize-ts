@@ -1,6 +1,5 @@
 import db from "../models";
 import redisUtils from "../redisConfig";
-import products from "../schemas/products";
 
 type ProductRequest = {
   id: string;
@@ -9,7 +8,7 @@ type ProductRequest = {
 };
 
 class ProductsService {
-  async index(data: Object): Promise<Object | Error> {
+  async index(data: Object): Promise<ProductRequest | Error> {
     try {
       const id = data;
 
@@ -29,8 +28,10 @@ class ProductsService {
     }
   }
 
-  async store(data: ProductRequest): Promise<Object | Error> {
+  async store(data: ProductRequest): Promise<ProductRequest | Error> {
     try {
+      await redisUtils.deleteRedis("products");
+
       return await db.Products.create(data);
     } catch (err) {
       throw err;
@@ -39,6 +40,8 @@ class ProductsService {
 
   async update(data: ProductRequest, params: string): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("products");
+
       return await db.Products.update(data, { where: { id: params } });
     } catch (err) {
       throw err;
@@ -47,6 +50,8 @@ class ProductsService {
 
   async delete(params: string): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("products");
+
       return await db.Products.delete({ where: { id: params } });
     } catch (err) {
       throw err;

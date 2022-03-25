@@ -8,7 +8,7 @@ type RequestRequest = {
 };
 
 class RequestsService {
-  async index(data: Object): Promise<Object | Error> {
+  async index(data: Object): Promise<RequestRequest | Error> {
     try {
       const id = data;
 
@@ -30,8 +30,9 @@ class RequestsService {
     }
   }
 
-  async store(data: RequestRequest): Promise<Object | Error> {
+  async store(data: RequestRequest): Promise<RequestRequest | Error> {
     try {
+      await redisUtils.deleteRedis("requests");
       return await db.Requests.create(data);
     } catch (err) {
       throw err;
@@ -40,6 +41,8 @@ class RequestsService {
 
   async update(data: RequestRequest, params: number): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("requests");
+
       return await db.Requests.update(data, { where: { id: params } });
     } catch (err) {
       throw err;
@@ -48,6 +51,8 @@ class RequestsService {
 
   async delete(params: number): Promise<Object | Error> {
     try {
+      await redisUtils.deleteRedis("requests");
+
       return await db.Requests.delete({ where: { id: params } });
     } catch (err) {
       throw err;

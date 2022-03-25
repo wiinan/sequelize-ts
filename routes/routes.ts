@@ -5,9 +5,11 @@ import ProviderRouter from "./providersRoutes";
 import RequestRouter from "./requestRouter";
 import productRequestRouter from "./productRequestRouter";
 import cartRouter from "./cartRouter";
+import authRouter from "./verifyRouter";
 
 const routes = Router();
 
+routes.use("/api", authRouter);
 routes.use("/api", userRouter);
 routes.use("/api", productRouter);
 routes.use("/api", ProviderRouter);

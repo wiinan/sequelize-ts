@@ -12,7 +12,7 @@ type UserRequest = {
 };
 
 class UserService {
-  async index(data: Object): Promise<Object | Error> {
+  async index(data: Object): Promise<UserRequest | Error> {
     try {
       const id = data;
 
@@ -32,7 +32,7 @@ class UserService {
     }
   }
 
-  async store(data: UserRequest): Promise<Object | Error> {
+  async store(data: UserRequest): Promise<UserRequest | Error> {
     try {
       const user = await db.Users.findOne({ where: { email: data.email } });
 

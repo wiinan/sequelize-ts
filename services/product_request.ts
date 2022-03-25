@@ -11,7 +11,7 @@ type ProductReqRequest = {
 };
 
 class ProductRequestService {
-  async index(data: Object): Promise<Object | Error> {
+  async index(data: Object): Promise<ProductReqRequest | Error> {
     try {
       const id = data;
 
@@ -36,7 +36,7 @@ class ProductRequestService {
     }
   }
 
-  async store(data: ProductReqRequest): Promise<Object | Error> {
+  async store(data: ProductReqRequest): Promise<ProductReqRequest | Error> {
     try {
       await db.Products_requests.create(data);
 

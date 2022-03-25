@@ -14,7 +14,7 @@ type ProviderRequest = {
 };
 
 class ProvidersService {
-  async index(data: Object): Promise<Object | Error> {
+  async index(data: Object): Promise<ProviderRequest | Error> {
     try {
       const id = data;
 
@@ -28,14 +28,15 @@ class ProvidersService {
         return providers;
       }
 
-      return JSON.stringify(redisProviders);
+      return JSON.parse(redisProviders);
     } catch (err) {
       throw err;
     }
   }
 
-  async store(data: ProviderRequest): Promise<Object | Error> {
+  async store(data: ProviderRequest): Promise<ProviderRequest | Error> {
     try {
+      redisUtils.deleteRedis("providers");
       return await db.Providers.create(data);
     } catch (err) {
       throw err;
@@ -44,6 +45,8 @@ class ProvidersService {
 
   async update(data: ProviderRequest, params: number): Promise<Object | Error> {
     try {
+      redisUtils.deleteRedis("providers");
+
       return await db.Providers.update(data, { where: { id: params } });
     } catch (err) {
       throw err;
@@ -52,6 +55,8 @@ class ProvidersService {
 
   async delete(params: number): Promise<Object | Error> {
     try {
+      redisUtils.deleteRedis("providers");
+
       return await db.Providers.delete({ where: { id: params } });
     } catch (err) {
       throw err;
